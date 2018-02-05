@@ -43,15 +43,15 @@ trait UserRoutes extends JsonSupport {
         pathEnd {
           concat(
             get {
-              val users: Future[Users] = 
+              val users: Future[Users] =
                 (userRegistryActor ? GetUsers).mapTo[Users]
               complete(users)
             },
             post {
               entity(as[User]) { user =>
-                val userCreated: Future[ActionPerformed] = 
+                val userCreated: Future[ActionPerformed] =
                   (userRegistryActor ? CreateUser(user)).mapTo[ActionPerformed]
-                onSuccess(userCreated) { performed => 
+                onSuccess(userCreated) { performed =>
                   log.info("Created user [{}]: {}", user.name, performed.description)
                   complete((StatusCodes.Created, performed))
                 }
@@ -65,7 +65,7 @@ trait UserRoutes extends JsonSupport {
           concat(
             get {
               //#retrieve-user-info
-              val maybeUser: Future[Option[User]] = 
+              val maybeUser: Future[Option[User]] =
                 (userRegistryActor ? GetUser(name)).mapTo[Option[User]]
               rejectEmptyResponse {
                 complete(maybeUser)
@@ -74,7 +74,7 @@ trait UserRoutes extends JsonSupport {
             },
             delete {
               //#users-delete-logic
-              val userDeleted: Future[ActionPerformed] = 
+              val userDeleted: Future[ActionPerformed] =
                 (userRegistryActor ? DeleteUser(name)).mapTo[ActionPerformed]
               onSuccess(userDeleted) { performed =>
                 log.info("Deleted user [{}]: {}", name, performed.description)
